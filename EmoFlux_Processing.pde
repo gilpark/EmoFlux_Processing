@@ -11,6 +11,7 @@ import java.util.*;
 import java.util.Map;
 
 ArrayList<Test_input> ilist;
+int input_range = 10; //range for mapping color and sentiment value 
 
 PVector loc;
 FluxSystem flux;
@@ -24,6 +25,7 @@ PShader blur;
 UnfoldingMap map;
 
 void setup() {
+  
   //frameRate(30);
   size(1200, 600, P3D);
   // background(255);

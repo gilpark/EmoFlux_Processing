@@ -1,5 +1,6 @@
 import java.util.regex.*;
 float s_max=0, s_min=0;
+
 //lexicon lists
 String negations = 
 "(never|nothing|nowhere|no one|none|not|havent|hasnt|hadnt|cant|couldnt|shouldnt|wont|wouldnt|dont|doesnt|didnt|isnt|arent|aint)";
@@ -55,8 +56,8 @@ float Sentiment(String text)
   score = (score/text.length())* factor;
   s_max = max(score, s_max);
   s_min = min(score, s_min);
-  float mapped_score = map(score, s_min, s_max, -10, 10);
-  //println(score+"  "+mapped_score);
+  float mapped_score = map(score, s_min, s_max, -input_range, input_range);
+ // println(score+"  "+mapped_score);
   return mapped_score;
   //return score*10;
 }
