@@ -27,18 +27,18 @@ UnfoldingMap map;
 void setup() {
   
   //frameRate(30);
-  size(1200, 600, P3D);
+  size(600, 700, P3D);
   // background(255);
   img = loadImage("texture4.png");
   back = loadImage("bg.gif");
   String mbTilesString = sketchPath("data/esm.mbtiles");
   //blur = loadShader("blur.glsl");
-  flux = new FluxSystem(10);
+  flux = new FluxSystem(100);
   flux.init();
   loc = new PVector(0, 0); // for test input
   ilist = new ArrayList<Test_input>(); //input list
   tstream = new Getstream(); //initialize twitter stream.
-  tstream.run();
+  //tstream.run();
 
   map = new UnfoldingMap(this, new MBTilesMapProvider(mbTilesString));
   map.zoomAndPanTo(new Location(38.8910, -96.5039), 4); //-96.5039,38.8910,5
@@ -72,7 +72,12 @@ void draw() {
       // a.display();
     }
   //map.draw();
-  image(back,width/2,height/2);
+  //image(back,width/2,height/2);
+}
+
+void mouseReleased(){
+  PVector test = new PVector(mouseX,mouseY);
+  flux.testinput(test,3);
 }
 
 

@@ -46,18 +46,29 @@ class Tile {
     int row = id/cols;
     //0 = N, 1 = E, 2 = S, 3 = W -> clockwise
     //THINK : is it better to make get neighbor function?
-
-    if (column <= 0 || column >= cols-1) {
-      neighbors[1] = -1; //if right one is out of boundary
-      neighbors[3] = -1; //left
-    } else if (row <= 0 && row >= row-1) {
-      neighbors[0] = -1; //if upper one is out of boundary
-      neighbors[2] = -1; //down
-    } else { // if they aer in the boundary
-      neighbors[0] = (row-1) * cols + column;
+    if (column == 0) {
       neighbors[1] = row * cols + column+1;
-      neighbors[2] = (row+1) * cols + column;
+      neighbors[3] = -1; //left
+    } 
+    if (column == cols-1) {
+      neighbors[1] = -1; //if right one is out of boundary
       neighbors[3] = row * cols + column-1;
+    } 
+    if (row == 0 ) {
+      neighbors[0] = -1; //if upper one is out of boundary
+      neighbors[2] = (row+1) * cols + column;
+    } 
+    if (row == rows-1) {
+      neighbors[0] = (row-1) * cols + column;
+      neighbors[2] = -1; //down
+    } 
+    if (column > 0 && column < cols-1) { // if they aer in the boundary
+      neighbors[1] = row * cols + column+1;
+      neighbors[3] = row * cols + column-1;
+    } 
+    if (row > 0 && row < rows-1) {
+      neighbors[0] = (row-1) * cols + column;
+      neighbors[2] = (row+1) * cols + column;
     }
   }
 
@@ -80,7 +91,7 @@ class Tile {
       }
     }
     //run and remove particles
-    for (Iterator<Particle> pit = particles.iterator(); pit.hasNext();) {
+    for (Iterator<Particle> pit = particles.iterator (); pit.hasNext(); ) {
       Particle p = pit.next();
       p.run();
       p.follow(f);         
@@ -91,7 +102,7 @@ class Tile {
   }
   void display() {
 
-    for (Particle p: particles) {
+    for (Particle p : particles) {
       p.display();
     }
     //draw tile when hit space
@@ -108,7 +119,7 @@ class Tile {
       popStyle();
     }
 
-    if (key=='v') {  
+    if (key=='l') {  
       //draw line
       stroke(255);
       line((x+size*0.5), (y+size*0.5), (x+size*0.5)+direction.x*4, (y+size*0.5)+direction.y*4);
@@ -125,3 +136,4 @@ class Tile {
     }
   }
 }
+
