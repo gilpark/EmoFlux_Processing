@@ -86,24 +86,21 @@ class Particle {
     acceleration.mult(0);
 
     if (velocity.mag() < 20 && age < 70)dead=true;
-    age--;
+    //age--;
     if (age < 0 ) dead = !dead;
 
     //velocity history
   }
   void display() {
-    pushMatrix();
-    translate(location.x, location.y);
-    //    fill(255);
-    //    ellipse(0, 0, 1, 1);
-    strokeWeight(0.5);
-
-    stroke(r+colorStart, r+colorStart, r+colorStart,100);
-    r++;
-    r %=360;
-    //stroke(ran,dim);
-    point(0, 0);
-    popMatrix();
+    pushStyle();
+//    strokeWeight(0.5);
+//    stroke(r+colorStart, r+colorStart, r+colorStart, 100);
+//    r++;
+//    r %=360;
+//    point(location.x, location.y);
+    fill(255);
+    ellipse(location.x, location.y, 1, 1);
+    popStyle();
   }
 
   // Wraparound

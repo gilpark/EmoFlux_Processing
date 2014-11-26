@@ -17,23 +17,21 @@ PVector loc;
 FluxSystem flux;
 Getstream tstream;
 
-boolean debug = true;
-boolean dots = true;
-boolean ran_input = false;
+boolean debug = false;
 PImage img, back;
 PShader blur;
 UnfoldingMap map;
 
 void setup() {
-  
+
   //frameRate(30);
-  size(600, 700, P3D);
+  size(1280, 720, P3D);
   // background(255);
   img = loadImage("texture4.png");
   back = loadImage("bg.gif");
   String mbTilesString = sketchPath("data/esm.mbtiles");
   //blur = loadShader("blur.glsl");
-  flux = new FluxSystem(100);
+  flux = new FluxSystem(10);
   flux.init();
   loc = new PVector(0, 0); // for test input
   ilist = new ArrayList<Test_input>(); //input list
@@ -56,28 +54,25 @@ void update() {
 void draw() { 
   //filter(blur);  
   update();
-  //println(frameRate);
-  //blendMode(LIGHTEST);
-  if (key==' ')background(0);
 
+  if (key==' ')background(0);
+  if (key=='d')debug = !debug;
 
   fill(0, 5);
   rect(0, 0, width, height);
 
   flux.display();
 
-  if (dots)
-    for (int i=0; i < ilist.size (); i++) {
-      Test_input a = ilist.get(i);  
-      // a.display();
-    }
+
   //map.draw();
   //image(back,width/2,height/2);
+  fill(255);
+  textSize(10);
+  text(frameRate, width-30, 20);
 }
 
-void mouseReleased(){
-  PVector test = new PVector(mouseX,mouseY);
-  flux.testinput(test,3);
+void mouseReleased() {
+  PVector test = new PVector(mouseX, mouseY);
+  flux.testinput(test, random(-10,10));
 }
-
 

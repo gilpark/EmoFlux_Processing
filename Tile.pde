@@ -33,13 +33,12 @@ class Tile {
 
     isGoal = false;
     isPassable = true;
-    Dbugmode = debug;
 
     cost = 0;
 
     direction = new PVector(0, 0);
     particles = new ArrayList<Particle>();
-
+    Dbugmode = debug;
     //find add neighbors in the array
     neighbors = new int[4];
     int column = id%cols; 
@@ -82,7 +81,7 @@ class Tile {
     cost2color = map(cost, -input_range, input_range, 0, 255); //map value for coloring
     tile_color = color(255, 255, 255, cost2color); 
 
-    particle_size = int(cost*0.5); 
+    particle_size = int(cost*0.8); 
 
     if (cost>0) { //if the cell is positive, create particles
       if (particles.size() < particle_size) { //adding particle if there are less than desired particle size
@@ -103,7 +102,7 @@ class Tile {
   void display() {
 
     for (Particle p : particles) {
-      p.display();
+        p.display();
     }
     //draw tile when hit space
     if (key==' ') {
@@ -121,8 +120,8 @@ class Tile {
 
     if (key=='l') {  
       //draw line
-      stroke(255);
-      line((x+size*0.5), (y+size*0.5), (x+size*0.5)+direction.x*4, (y+size*0.5)+direction.y*4);
+      stroke(0, 255, 0);
+      line((x+size*0.5), (y+size*0.5), (x+size*0.5)+direction.x*(size*0.1), (y+size*0.5)+direction.y*(size*0.1));
       noStroke();
     }
     if (Dbugmode) {

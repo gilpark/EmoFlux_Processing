@@ -79,22 +79,17 @@ class FluxSystem {
 
       //copy temp_cells' data to cells
     for (int i=0; i < cells.size (); i++) {
-
       Tile cell = cells.get(i);
       Tile t_cell = temp_cells.get(i);
-
       if (cell.cost==0 && !t_cell.isPassable) { // if cell's cost = 0 and temp_cell has cost
         cell.cost = t_cell.cost;
         cell.isPassable = t_cell.isPassable; 
         cell.isGoal = t_cell.isGoal;//
       } else if (cell.cost!=0&&!cell.isPassable&&!t_cell.isPassable) { //if cell and temp_cell already have values 
-
         cell.cost=(cell.cost+t_cell.cost)*0.5; //normalize
       }
-
       t_cell.reset(); //reset tempcell for next inputs
     }
-
     for (Tile t : cells)calculateDirection(t);
   }   
   void testinput(PVector test, float ran) {
@@ -116,24 +111,19 @@ class FluxSystem {
     getField(id); //start calculating field
 
       //copy temp_cells' data to cells
-   for (int i=0; i < cells.size (); i++) {
-
+    for (int i=0; i < cells.size (); i++) {
       Tile cell = cells.get(i);
       Tile t_cell = temp_cells.get(i);
-
       if (cell.cost==0 && !t_cell.isPassable) { // if cell's cost = 0 and temp_cell has cost
         cell.cost = t_cell.cost;
         cell.isPassable = t_cell.isPassable; 
         cell.isGoal = t_cell.isGoal;//
       } else if (cell.cost!=0&&!cell.isPassable&&!t_cell.isPassable) { //if cell and temp_cell already have values 
-
         cell.cost=(cell.cost+t_cell.cost)*0.5; //normalize
       }
-
       t_cell.reset(); //reset tempcell for next inputs
     }
-
-   // for (Tile t : cells)calculateDirection(t);
+    for (Tile t : cells)calculateDirection(t);
   }   
 
   void getField(int id) {
@@ -168,8 +158,14 @@ class FluxSystem {
       Tile t = temp_cells.get(center.neighbors[i]);
 
       //TODO :: think about when center.cost is 0.5
-      t.cost = center.cost + step; //if the center one has positive val, we subtract -1
-
+      if (center.cost>0) { 
+        float temp = constrain(center.cost + step,0,input_range);
+        t.cost = temp; //if the center one has positive val, we subtract -1
+      }
+      if (center.cost<0) {
+        float temp = constrain(center.cost + step,-input_range,0);
+        t.cost = temp; //if the center one has positive val, we subtract -1
+      }
       if (t.cost > 0 && t.isPassable) {
         t.isPassable=false;
         visitList.add(t.id);// add it self to the visitied list to find its neighbors
@@ -181,26 +177,20 @@ class FluxSystem {
   }
 
   void calculateDirection(Tile center) {
-
     float X, Y;
     float N=0, E=0, S=0, W = 0;
 
-    for (int i : center.neighbors) {
-      //N->E->S->W
-      if (i!=-1) { //out of boundary indexs are -1, check Tile constructor
-        N = temp_cells.get(center.neighbors[0]).cost;
-        E = temp_cells.get(center.neighbors[1]).cost;
-        S = temp_cells.get(center.neighbors[2]).cost;
-        W = temp_cells.get(center.neighbors[3]).cost;
-      }
-      //if neighbors indexs are out of bound, the cost gonna be 0
-    }
+    if (center.neighbors[0]>0)N = cells.get(center.neighbors[0]).cost;
+    if (center.neighbors[1]>0)E = cells.get(center.neighbors[1]).cost;
+    if (center.neighbors[2]>0)S = cells.get(center.neighbors[2]).cost;
+    if (center.neighbors[3]>0)W = cells.get(center.neighbors[3]).cost;
+
     X = W-E;
     Y = N-S;
 
-    center.direction.set(Y-X/2, -X-Y/2);
-    //check this article if interested
-    //http://www.math.uic.edu/coursepages/math210/labpages/lab7
+    center.direction.set(-Y+X/2, X+Y/2);
+    //    //check this article if interested
+    //    //http://www.math.uic.edu/coursepages/math210/labpages/lab7
   }
 }
 

@@ -57,7 +57,7 @@ float Sentiment(String text)
   s_max = max(score, s_max);
   s_min = min(score, s_min);
   float mapped_score = map(score, s_min, s_max, input_range, -input_range);
- // println(score+"  "+mapped_score);
+  //println("score : "+mapped_score+"  msg : "+text);
   return mapped_score;
   //return score*10;
 }
