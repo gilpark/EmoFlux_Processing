@@ -26,8 +26,14 @@ class FluxSystem {
     for (int id = 0; id < numCells; id++) {
       int _x = id%cols;
       int _y = id/cols;
-      cells.add(new Tile(id, _x*resolution, _y*resolution, resolution, this, cols, rows));
-      temp_cells.add(new Tile(id, _x*resolution, _y*resolution, resolution, this, cols, rows));
+      if (alpha(boundbox.get(_x*resolution, _y*resolution))>0) {
+
+        cells.add(new Tile(id, _x*resolution, _y*resolution, resolution, this, cols, rows, false));
+        temp_cells.add(new Tile(id, _x*resolution, _y*resolution, resolution, this, cols, rows, false));
+      } else if (alpha(boundbox.get(_x*resolution, _y*resolution))<=0) {
+        cells.add(new Tile(id, _x*resolution, _y*resolution, resolution, this, cols, rows, true));
+        temp_cells.add(new Tile(id, _x*resolution, _y*resolution, resolution, this, cols, rows, true));
+      }
     }
 
     println("TILE SIZE : "+ cells.size());
@@ -38,6 +44,10 @@ class FluxSystem {
     //add & update particles & tiles
     for (Tile c : cells) {
       c.update();
+      if (cnt%300 ==0) {
+        //println("count : "+cnt+" --//reset!!");
+        c.cost=c.cost/2;
+      }
     }
   }
 
@@ -75,22 +85,24 @@ class FluxSystem {
     // println("id : "+ id + " added : "+ temp.cost + "  msg : "+ msg);
 
     temp.isGoal = true;
-    getField(id); //start calculating field
+    if (temp.empty) {
+      getField(id); //start calculating field
 
-      //copy temp_cells' data to cells
-    for (int i=0; i < cells.size (); i++) {
-      Tile cell = cells.get(i);
-      Tile t_cell = temp_cells.get(i);
-      if (cell.cost==0 && !t_cell.isPassable) { // if cell's cost = 0 and temp_cell has cost
-        cell.cost = t_cell.cost;
-        cell.isPassable = t_cell.isPassable; 
-        cell.isGoal = t_cell.isGoal;//
-      } else if (cell.cost!=0&&!cell.isPassable&&!t_cell.isPassable) { //if cell and temp_cell already have values 
-        cell.cost=(cell.cost+t_cell.cost)*0.5; //normalize
+        //copy temp_cells' data to cells
+      for (int i=0; i < cells.size (); i++) {
+        Tile cell = cells.get(i);
+        Tile t_cell = temp_cells.get(i);
+        if (cell.cost==0 && !t_cell.isPassable) { // if cell's cost = 0 and temp_cell has cost
+          cell.cost = t_cell.cost;
+          cell.isPassable = t_cell.isPassable; 
+         // cell.isGoal = t_cell.isGoal;//
+        } else if (cell.cost!=0&&!cell.isPassable&&!t_cell.isPassable) { //if cell and temp_cell already have values 
+          cell.cost=(cell.cost+t_cell.cost)*0.5; //normalize
+        }
+        t_cell.reset(); //reset tempcell for next inputs
       }
-      t_cell.reset(); //reset tempcell for next inputs
+      for (Tile t : cells)calculateDirection(t);
     }
-    for (Tile t : cells)calculateDirection(t);
   }   
   void testinput(PVector test, float ran) {
 
@@ -100,30 +112,31 @@ class FluxSystem {
     int column = int(constrain(spos.x/resolution, 0, cols-1));
     int row = int(constrain(spos.y/resolution, 0, rows-1));
     int id =  row * cols +column;
-    float emo_val =  ran; //get emotion value
 
     //adding data to temporary cell
     Tile temp = temp_cells.get(id );
-    temp.cost=emo_val;
+    temp.cost=ran;
     //println("test input - id : "+ id + " added : "+ temp.cost);
 
     temp.isGoal = true;
-    getField(id); //start calculating field
+    if (temp.empty) {
+      getField(id); //start calculating field
 
-      //copy temp_cells' data to cells
-    for (int i=0; i < cells.size (); i++) {
-      Tile cell = cells.get(i);
-      Tile t_cell = temp_cells.get(i);
-      if (cell.cost==0 && !t_cell.isPassable) { // if cell's cost = 0 and temp_cell has cost
-        cell.cost = t_cell.cost;
-        cell.isPassable = t_cell.isPassable; 
-        cell.isGoal = t_cell.isGoal;//
-      } else if (cell.cost!=0&&!cell.isPassable&&!t_cell.isPassable) { //if cell and temp_cell already have values 
-        cell.cost=(cell.cost+t_cell.cost)*0.5; //normalize
+        //copy temp_cells' data to cells
+      for (int i=0; i < cells.size (); i++) {
+        Tile cell = cells.get(i);
+        Tile t_cell = temp_cells.get(i);
+        if (cell.cost==0 && !t_cell.isPassable) { // if cell's cost = 0 and temp_cell has cost
+          cell.cost = t_cell.cost;
+          cell.isPassable = t_cell.isPassable; 
+          cell.isGoal = t_cell.isGoal;//
+        } else if (cell.cost!=0&&!cell.isPassable&&!t_cell.isPassable) { //if cell and temp_cell already have values 
+          cell.cost=(cell.cost+t_cell.cost)*0.5; //normalize
+        }
+        t_cell.reset(); //reset tempcell for next inputs
       }
-      t_cell.reset(); //reset tempcell for next inputs
+      for (Tile t : cells)calculateDirection(t);
     }
-    for (Tile t : cells)calculateDirection(t);
   }   
 
   void getField(int id) {
@@ -137,7 +150,7 @@ class FluxSystem {
       Tile target = temp_cells.get(front);
       if (target.cost < 0) {
         findNeighbors(target, 1); //negative goes here
-      } else {
+      } else if (target.cost > 0) {
         findNeighbors(target, -1); //pasitive
       }
       // println("tested : "+visitList.get(visitList.size ()-1));
@@ -159,11 +172,15 @@ class FluxSystem {
 
       //TODO :: think about when center.cost is 0.5
       if (center.cost>0) { 
-        float temp = constrain(center.cost + step,0,input_range);
+        float temp;
+        //if (center.cost < 2)temp= constrain(center.cost - 0.1, 0, input_range);
+        temp= constrain(center.cost + step, 0, input_range);
         t.cost = temp; //if the center one has positive val, we subtract -1
       }
       if (center.cost<0) {
-        float temp = constrain(center.cost + step,-input_range,0);
+        float temp;
+        //if (center.cost > -2)temp= constrain(center.cost + 0.1, 0, input_range);
+        temp= constrain(center.cost + step, -input_range, 0);
         t.cost = temp; //if the center one has positive val, we subtract -1
       }
       if (t.cost > 0 && t.isPassable) {
@@ -187,8 +204,10 @@ class FluxSystem {
 
     X = W-E;
     Y = N-S;
-
-    center.direction.set(-Y+X/2, X+Y/2);
+//    X = E-W;
+//    Y = S-N;
+    center.direction.set((-Y+X/2), (X+Y/2));
+    //center.direction.set((-Y+X/2+X/2), (X+Y/2+Y/2));
     //    //check this article if interested
     //    //http://www.math.uic.edu/coursepages/math210/labpages/lab7
   }

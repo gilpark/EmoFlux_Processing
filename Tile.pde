@@ -12,7 +12,8 @@ class Tile {
 
   boolean isGoal, 
   isPassable, // to check this cell can receive new value
-  Dbugmode;
+  Dbugmode, 
+  empty;
 
   PVector direction; //a vector indicates the direction of flow
   FluxSystem f;
@@ -20,7 +21,7 @@ class Tile {
   ArrayList<Particle> particles;
   color tile_color;
 
-  Tile(int _id, float _x, float _y, int resolution, FluxSystem _f, int _cols, int _rows) {
+  Tile(int _id, float _x, float _y, int resolution, FluxSystem _f, int _cols, int _rows, boolean _empty) {
 
     id = _id;
     x = _x;
@@ -33,7 +34,7 @@ class Tile {
 
     isGoal = false;
     isPassable = true;
-
+    empty = _empty;
     cost = 0;
 
     direction = new PVector(0, 0);
@@ -81,19 +82,19 @@ class Tile {
     cost2color = map(cost, -input_range, input_range, 0, 255); //map value for coloring
     tile_color = color(255, 255, 255, cost2color); 
 
-    particle_size = int(cost*0.8); 
+    particle_size = int(cost+5); 
+    PVector ploc = new PVector(x + random(size), y + random(size) );
 
-    if (cost>0) { //if the cell is positive, create particles
-      if (particles.size() < particle_size) { //adding particle if there are less than desired particle size
-        PVector ploc = new PVector(x + random(size), y + random(size) );
-        particles.add(new Particle(ploc, 0.5, 0.02)); //location, max speed, max force(for steering)
+    if (cost>0 && empty) { //if the cell is positive, create particles
+      if (particles.size() < particle_size+1) { //adding particle if there are less than desired particle size
+        particles.add(new Particle(ploc, 0.5, 0.03)); //location, max speed, max force(for steering)
       }
     }
     //run and remove particles
     for (Iterator<Particle> pit = particles.iterator (); pit.hasNext(); ) {
       Particle p = pit.next();
       p.run();
-      p.follow(f);         
+      p.follow(f);
       if (p.dead) {
         pit.remove();
       }
@@ -102,20 +103,21 @@ class Tile {
   void display() {
 
     for (Particle p : particles) {
-        p.display();
+      p.display();
     }
     //draw tile when hit space
+
     if (key==' ') {
       if (isGoal) {
         fill(255, 0, 255);
+      } else if (!empty) {
+        fill(0);
       } else {
         fill(tile_color);
       }
-      pushStyle();
-      stroke(255);
-      strokeWeight(0.5);
+      //stroke(255,10);
+      //strokeWeight(0.5);
       rect(x, y, size, size);
-      popStyle();
     }
 
     if (key=='l') {  
@@ -125,13 +127,11 @@ class Tile {
       noStroke();
     }
     if (Dbugmode) {
-      pushStyle();
       fill(0);
       textSize(size/10);
       text(id, x+size/2, y+size/2);
       text(int(cost), x+10, y+10);
       //text("("+direction.x+","+direction.y+")",x+size/2-10, y+size/2);
-      popStyle();
     }
   }
 }

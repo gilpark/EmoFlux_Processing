@@ -6,6 +6,7 @@ import twitter4j.conf.*;
 import twitter4j.json.*;
 import twitter4j.auth.*;
 
+int cnt2;
 class Getstream
 {	
   ///////////////////// set your twitter dev info ////////////////////////////////
@@ -130,9 +131,11 @@ class Getstream
       if (lang.equals("en")) {
         // add tweets in the field
         //flowfield.addtweet(loc, msg);
-        
+        if(cnt2%15==0){
         flux.addTweet(loc, msg);
-
+        //println(cnt2);
+        }
+        cnt2++;
       }
     }
 
