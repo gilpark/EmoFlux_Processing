@@ -1,3 +1,5 @@
+
+
 class FluxSystem {
   boolean debug;
 
@@ -6,6 +8,7 @@ class FluxSystem {
   ArrayList<Tile> cells;
   ArrayList<Tile> temp_cells;
   ArrayList<Integer> visitList;
+ // ArrayList<TStatus> statusList;
 
   FluxSystem(int r) {
 
@@ -13,6 +16,7 @@ class FluxSystem {
     cells = new ArrayList<Tile>();
     temp_cells = new ArrayList<Tile>();
     visitList = new ArrayList<Integer>();
+    //statusList = new ArrayList<TStatus>();
 
     cols = width/resolution;
     rows = height/resolution;
@@ -46,7 +50,7 @@ class FluxSystem {
       c.update();
       if (cnt%300 ==0) {
         //println("count : "+cnt+" --//reset!!");
-        c.cost=c.cost/2;
+        c.cost=0;
       }
     }
   }
@@ -55,6 +59,13 @@ class FluxSystem {
     for (Tile c : cells) {
       c.display();
     }
+
+//    for (TStatus t : statusList) {
+//      t.display();
+//      if (t.onMouseOver(mouseX, mouseY)) {
+//        break; // break the loop if a mouse over is detected, so it doesn't fire on overlapping tweets
+//      }
+//    }
   }
 
   //for Particle to look up it's location in the field
@@ -67,7 +78,7 @@ class FluxSystem {
   }
 
 
-  void addTweet(GeoLocation _tweetloc, String msg) {
+  void addTweet(GeoLocation _tweetloc, String msg, String user) {
     //convert tweet location to screen position
     Location tweetloc = new Location(_tweetloc.getLatitude(), _tweetloc.getLongitude());
     ScreenPosition temp_sos  = map.getScreenPosition(tweetloc);
@@ -95,7 +106,7 @@ class FluxSystem {
         if (cell.cost==0 && !t_cell.isPassable) { // if cell's cost = 0 and temp_cell has cost
           cell.cost = t_cell.cost;
           cell.isPassable = t_cell.isPassable; 
-         // cell.isGoal = t_cell.isGoal;//
+          // cell.isGoal = t_cell.isGoal;//
         } else if (cell.cost!=0&&!cell.isPassable&&!t_cell.isPassable) { //if cell and temp_cell already have values 
           cell.cost=(cell.cost+t_cell.cost)*0.5; //normalize
         }
@@ -103,6 +114,8 @@ class FluxSystem {
       }
       for (Tile t : cells)calculateDirection(t);
     }
+
+    statusList.add(new TStatus(msg, user, spos, emo_val));
   }   
   void testinput(PVector test, float ran) {
 
@@ -204,8 +217,8 @@ class FluxSystem {
 
     X = W-E;
     Y = N-S;
-//    X = E-W;
-//    Y = S-N;
+    //    X = E-W;
+    //    Y = S-N;
     center.direction.set((-Y+X/2), (X+Y/2));
     //center.direction.set((-Y+X/2+X/2), (X+Y/2+Y/2));
     //    //check this article if interested

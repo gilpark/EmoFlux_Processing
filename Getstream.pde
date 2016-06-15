@@ -7,25 +7,16 @@ import twitter4j.json.*;
 import twitter4j.auth.*;
 
 int cnt2;
+String date = "";
 class Getstream
 {	
   ///////////////////// set your twitter dev info ////////////////////////////////
   /// This is where you enter your Oauth info
-  String OAuthConsumerKey = "zaO66kuC9onpl3JT1mJHmvJTV";
-  String OAuthConsumerSecret = "LKuBOhkrGBir7QYsh8MB53CFyMfRJr4o3TWwzlP3Sx10hb1vbu";
+  String OAuthConsumerKey = "";
+  String OAuthConsumerSecret = "";
   // This is where you enter your Access Token info
-  String AccessToken = "2484618828-nwlFhfbygQTXb2mX9S4tON8AINzHMF122YA4ZMM";
-  String AccessTokenSecret = "XnePyCIxhcaqNeoxJ5CaOmPrhEMvRWRxAnWH3r5slrYJT";
-
-
-
-
-
-  // String OAuthConsumerKey = "hlTBBoYudhL44hHwegUezQ";
-  // String OAuthConsumerSecret = "k0AmVsQ7e8dvu98h5POxWHoXtYL88YOXP0UzhpUV98";
-  // // This is where you enter your Access Token info
-  // String AccessToken = "1299643790-OEFCavotvw1G8gUYQrEG5TSoxHeTp2GsBiV5zlJ";
-  // String AccessTokenSecret = "wM9ov7ajQcUUkdgIGm4XMKtaV5zB5vGMky16sbkQlAI";
+  String AccessToken = "";
+  String AccessTokenSecret = "";
 
   AccessToken loadAccessToken() 
 
@@ -98,7 +89,7 @@ class Getstream
     FilterQuery query = new FilterQuery();
     query.locations(loc);
     query.track(keywords);
-    query.language(lang);
+   // query.language(lang);
     println(query);
     twitter.filter(query);
   }
@@ -125,18 +116,24 @@ class Getstream
       GeoLocation loc = status.getGeoLocation();
       Place place = status.getPlace();
       Date time = status.getCreatedAt();
-      String lang = status.getLang();
+     // String lang = status.getLang();
+     date = time.toString();
 
       //fillter only english tweets
       if (lang.equals("en")) {
         // add tweets in the field
         //flowfield.addtweet(loc, msg);
         if(cnt2%15==0){
-        flux.addTweet(loc, msg);
+        flux.addTweet(loc, msg, name);
         //println(cnt2);
         }
         cnt2++;
       }
+      if(cnt2%15==0){
+        flux.addTweet(loc, msg, name);
+        //println(cnt2);
+        }
+        cnt2++;
     }
 
     void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {
@@ -148,9 +145,9 @@ class Getstream
     void onScrubGeo(long userId, long upToStatusId) {
       //System.out.println("Got scrub_geo event userId:" + userId + " upToStatusId:" + upToStatusId);
     }
-    void onStallWarning(StallWarning warning) {
-      //System.out.println("Got stall warning:" + warning);
-    }
+//    void onStallWarning(StallWarning warning) {
+//      //System.out.println("Got stall warning:" + warning);
+//    }
 
     void onException(Exception ex) {
       //ex.printStackTrace();

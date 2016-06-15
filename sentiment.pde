@@ -53,15 +53,16 @@ float Sentiment(String text)
     //println(score);
   }
 
-  score = (score/text.length())* factor;
+  score = (score/text.length());//* factor;
   s_max = max(score, s_max);
   s_min = min(score, s_min);
-  float mapped_score = map(score, s_min, s_max, input_range, -input_range);
+  float mapped_score = map(score, s_min, s_max, -input_range, input_range);
   cnt++;
-  //cnt %= 500;
-  //println(cnt);
-  //println("score : "+mapped_score+"  msg : "+text);
+ 
+  if(mapped_score>0)posi++;
+  if(mapped_score<0)nega++;
+  total = posi+nega;
+ // println("score : "+mapped_score+"  msg : "+text);
   return mapped_score;
-  //return score*10;
 }
 

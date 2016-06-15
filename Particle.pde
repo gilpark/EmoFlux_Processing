@@ -4,6 +4,13 @@
 float colorStart =  180;               // Starting dregee of color range in HSB Mode (0-360)
 float colorRange =  160;             // color range / can also be negative
 
+color startColor = #e895b3;
+color endColor = #e8e395;
+//color startColor2 = #66ff00;
+//color endColor2 = #9600ff;
+color startColor2 = color(255,255,255);//#66ff00;
+color endColor2 = color(0,0,0);
+
 class Particle {
 
   // The usual stuff
@@ -21,7 +28,7 @@ class Particle {
   int history_counter;
   float dim;
   float stroke;
-  
+
   Particle(PVector l, float ms, float mf) {
     location = l.get();
     r = 3.0;
@@ -32,22 +39,15 @@ class Particle {
     age =(int)random(80, 230); //1sec
     age2 = age;
     ran = color(random(255), random(255), random(255));
-    history = new PVector[10];
-    dim = 20;
+    history = new PVector[2];
+    dim = 0;
     //println("P");
   }
 
   public void run() {
     update();
     borders();
-    history[history_counter] = location;
-    history_counter++;
-    history_counter %=10;
-    if (age < age2/2 && location.dist(history[0]) < 3)dead = true;
-//    if (location.dist(history[0]) > 0.1) {
-//      println("asdf");
-//      dim=200;
-//    }
+
   }
 
   // Implementing Reynolds' flow field following algorithm
@@ -63,11 +63,16 @@ class Particle {
     PVector pre_desired;
 
     if (desired.dist(new PVector(0, 0, 0))!=0) {
-      pre_desired = desired;
+      //pre_desired = desired;
       steer = PVector.sub(desired, velocity);
 
       steer.limit(maxforce);  // Limit to maximum steering force
       applyForce(steer);
+      dim = 10;
+    }
+    if (desired.mag()<1) {
+      dim -=0.5;
+      //dead=true;
     }
   }
 
@@ -93,9 +98,12 @@ class Particle {
     //velocity history
   }
   void display() {
-   stroke = map(age,0,age2,3,0);
+    stroke = map(age, 0, age2, 2, 0);
     strokeWeight(stroke);
-    stroke(r+colorStart, r+colorStart, r+colorStart, dim);
+    //stroke(r+colorStart, r+colorStart, r+colorStart, dim);
+    color pointcolor = lerpColor(startColor,endColor,map(age,age2,0,0,1));
+    stroke(red(pointcolor),green(pointcolor),blue(pointcolor),dim);
+    
     r++;
     r %=360;
     point(location.x, location.y);
@@ -107,7 +115,7 @@ class Particle {
 
   // Wraparound
   void borders() {
-    if (location.x <0 ||location.y <0||location.x > width||location.y > height) dead=true;
+    if (location.x <100 ||location.y <100||location.x > width-50||location.y > height-50) dead=true;
   }
 }
 

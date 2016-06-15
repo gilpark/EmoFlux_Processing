@@ -87,7 +87,7 @@ class Tile {
 
     if (cost>0 && empty) { //if the cell is positive, create particles
       if (particles.size() < particle_size+1) { //adding particle if there are less than desired particle size
-        particles.add(new Particle(ploc, 0.5, 0.03)); //location, max speed, max force(for steering)
+        particles.add(new Particle(ploc, 0.5, 0.02)); //location, max speed, max force(for steering)
       }
     }
     //run and remove particles
